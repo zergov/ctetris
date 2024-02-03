@@ -60,10 +60,10 @@ int main(int argc, char *argv[]) {
     int colors[9][3] = {
         {0, 0, 0},          // empty spaces are BLACK
         {128, 128, 128},    // walls are GRAY
-        {64, 224, 208},     // long bois are TURQUOISE
-        {0, 0, 255},        // reverse L shapes are BLUE
+        {64, 224, 208},     // I shapes are TURQUOISE
+        {0, 0, 255},        // J shapes are BLUE
         {255, 165, 0},      // L shapes are ORANGE
-        {255, 255, 0},      // cubes shapes are YELLOW
+        {255, 255, 0},      // O shapes are YELLOW
         {0, 255, 0},        // S shapes are GREEN
         {128, 0, 128},      // T shapes are PURPLE
         {255, 0, 0},        // Z shapes are RED
