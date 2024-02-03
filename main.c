@@ -69,6 +69,9 @@ int main(int argc, char *argv[]) {
         {255, 0, 0},        // Z shapes are RED
     };
 
+    int x_padding = (WINDOW_W / 2) - ((BOARD_W / 2) * CELL_SIZE);
+    int y_padding = (WINDOW_H / 2) - ((BOARD_H / 2) * CELL_SIZE);
+
     struct SDL_Rect cell;
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
@@ -86,16 +89,12 @@ int main(int argc, char *argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
-        int x_padding = (WINDOW_W / 2) - ((BOARD_W / 2) * CELL_SIZE);
-        int y_padding = (WINDOW_H / 2) - ((BOARD_H / 2) * CELL_SIZE);
-
         for (int i = 0; i < BOARD_H; i++) {
             for (int j = 0; j < BOARD_W; j++) {
-                int cell_type = board[i][j];
-
                 cell.x = x_padding + j * cell.w;
                 cell.y = y_padding + i * cell.h;
 
+                int cell_type = board[i][j];
                 int r = colors[cell_type][0];
                 int g = colors[cell_type][1];
                 int b = colors[cell_type][2];
