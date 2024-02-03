@@ -102,6 +102,9 @@ int main(int argc, char *argv[]) {
 
                 SDL_SetRenderDrawColor(renderer, r, g, b, 0);
                 SDL_RenderFillRect(renderer, &cell);
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                SDL_RenderDrawRect(renderer, &cell);
             }
         }
 
