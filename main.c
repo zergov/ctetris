@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     tetromino.rotation = 0;
     tetromino.x = 6;
     tetromino.y = 0;
-    tetromino.shape = TETROMINO_I_SHAPE;
+    tetromino.shape = TETROMINO_S_SHAPE;
 
     uint64_t now = SDL_GetTicks64();
     uint64_t tick_time = 500; // milliseconds
