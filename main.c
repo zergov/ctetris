@@ -76,12 +76,36 @@ int main(int argc, char *argv[]) {
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
 
+    int tetromino_x = 6;
+    int tetromino_y = 0;
+    int tetromino[4][4] = {
+        {2, 0, 0, 0},
+        {2, 0, 0, 0},
+        {2, 0, 0, 0},
+        {2, 0, 0, 0},
+    };
+
     while (1) {
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
                     exit(0);
+                    break;
+
+                case SDL_KEYDOWN:
+                    if (event.key.repeat != 0) break;
+
+                    switch (event.key.keysym.scancode) {
+                        case SDL_SCANCODE_LEFT:
+                            tetromino_x -= 1;
+                            break;
+                        case SDL_SCANCODE_RIGHT:
+                            tetromino_x += 1;
+                            break;
+                        default:
+                            break;
+                    }
                     break;
             }
         }
@@ -104,6 +128,26 @@ int main(int argc, char *argv[]) {
 
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
                 SDL_RenderDrawRect(renderer, &cell);
+            }
+        }
+
+        // draw falling tetromino
+        int cell_type = 3;
+        int r = colors[cell_type][0];
+        int g = colors[cell_type][1];
+        int b = colors[cell_type][2];
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; i < 4; i++) {
+                if (tetromino[i][j] != 0) {
+                    cell.x = (tetromino_x * cell.w) + x_padding + j * cell.w;
+                    cell.y = (tetromino_y * cell.h) + y_padding + i * cell.h;
+
+                    SDL_SetRenderDrawColor(renderer, r, g, b, 0);
+                    SDL_RenderFillRect(renderer, &cell);
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                    SDL_RenderDrawRect(renderer, &cell);
+                }
             }
         }
 
