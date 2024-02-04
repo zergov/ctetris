@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 
 #include <SDL2/SDL.h>
 
@@ -85,6 +86,10 @@ int main(int argc, char *argv[]) {
         {2, 0, 0, 0},
     };
 
+    uint64_t now = SDL_GetTicks64();
+    uint64_t tick_time = 500; // milliseconds
+    uint64_t tick_timeout = now + tick_time;
+
     while (1) {
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
@@ -110,6 +115,16 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        now = SDL_GetTicks64();
+
+        // update game state
+        if (now >= tick_timeout) {
+            tick_timeout = now + tick_time;
+
+            tetromino_y += 1;
+        }
+
+        // render game state
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
 
@@ -131,7 +146,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // draw falling tetromino
         int cell_type = 3;
         int r = colors[cell_type][0];
         int g = colors[cell_type][1];
