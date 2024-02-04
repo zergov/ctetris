@@ -3,11 +3,19 @@
 
 #include <SDL2/SDL.h>
 
+#include "tetris.h"
+
 #define WINDOW_W 1024
 #define WINDOW_H 768
 #define BOARD_W 12
 #define BOARD_H 22
 #define CELL_SIZE 30
+
+struct tetromino {
+    int x, y;
+    int rotation;
+    struct tetromino_shape shape;
+};
 
 int main(int argc, char *argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -77,14 +85,11 @@ int main(int argc, char *argv[]) {
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
 
-    int tetromino_x = 6;
-    int tetromino_y = 0;
-    int tetromino[4][4] = {
-        {2, 0, 0, 0},
-        {2, 0, 0, 0},
-        {2, 0, 0, 0},
-        {2, 0, 0, 0},
-    };
+    struct tetromino tetromino;
+    tetromino.rotation = 0;
+    tetromino.x = 6;
+    tetromino.y = 0;
+    tetromino.shape = TETROMINO_I_SHAPE;
 
     uint64_t now = SDL_GetTicks64();
     uint64_t tick_time = 500; // milliseconds
@@ -102,11 +107,14 @@ int main(int argc, char *argv[]) {
                     if (event.key.repeat != 0) break;
 
                     switch (event.key.keysym.scancode) {
+                        case SDL_SCANCODE_SPACE:
+                            tetromino.rotation = (tetromino.rotation + 1) % 4;
+                            break;
                         case SDL_SCANCODE_LEFT:
-                            tetromino_x -= 1;
+                            tetromino.x -= 1;
                             break;
                         case SDL_SCANCODE_RIGHT:
-                            tetromino_x += 1;
+                            tetromino.x += 1;
                             break;
                         default:
                             break;
@@ -121,7 +129,7 @@ int main(int argc, char *argv[]) {
         if (now >= tick_timeout) {
             tick_timeout = now + tick_time;
 
-            tetromino_y += 1;
+            tetromino.y += 1;
         }
 
         // render game state
@@ -146,16 +154,16 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        int cell_type = 3;
-        int r = colors[cell_type][0];
-        int g = colors[cell_type][1];
-        int b = colors[cell_type][2];
+        int r = colors[tetromino.shape.type][0];
+        int g = colors[tetromino.shape.type][1];
+        int b = colors[tetromino.shape.type][2];
 
         for (int i = 0; i < 4; i++) {
-            for (int j = 0; i < 4; i++) {
-                if (tetromino[i][j] != 0) {
-                    cell.x = (tetromino_x * cell.w) + x_padding + j * cell.w;
-                    cell.y = (tetromino_y * cell.h) + y_padding + i * cell.h;
+            for (int j = 0; j < 4; j++) {
+                int shape_cell = tetromino.shape.cells[i + 4*tetromino.rotation][j];
+                if (shape_cell != 0) {
+                    cell.x = (tetromino.x * cell.w) + x_padding + j * cell.w;
+                    cell.y = (tetromino.y * cell.h) + y_padding + i * cell.h;
 
                     SDL_SetRenderDrawColor(renderer, r, g, b, 0);
                     SDL_RenderFillRect(renderer, &cell);
