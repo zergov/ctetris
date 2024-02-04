@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
+#include <stdlib.h>
 
 #include <SDL2/SDL.h>
 
@@ -18,6 +20,8 @@ struct tetromino {
 };
 
 int main(int argc, char *argv[]) {
+    srand(time(NULL));
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -84,12 +88,22 @@ int main(int argc, char *argv[]) {
     struct SDL_Rect cell;
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
-
+    
+    struct tetromino_shape tetrominos[7] = {
+        TETROMINO_I_SHAPE,
+        TETROMINO_J_SHAPE,
+        TETROMINO_L_SHAPE,
+        TETROMINO_O_SHAPE,
+        TETROMINO_S_SHAPE,
+        TETROMINO_T_SHAPE,
+        TETROMINO_Z_SHAPE,
+    };
+    
     struct tetromino tetromino;
     tetromino.rotation = 0;
     tetromino.x = 6;
     tetromino.y = 0;
-    tetromino.shape = TETROMINO_S_SHAPE;
+    tetromino.shape = tetrominos[rand() % 7];
 
     uint64_t now = SDL_GetTicks64();
     uint64_t tick_time = 500; // milliseconds
