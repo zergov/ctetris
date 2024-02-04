@@ -128,6 +128,7 @@ const struct tetromino_shape TETROMINO_S_SHAPE = {
     }
 };
 
+// written by my girlfriend <3 
 const struct tetromino_shape TETROMINO_T_SHAPE = {
     7,
     {
