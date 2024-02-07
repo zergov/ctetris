@@ -46,8 +46,7 @@ bool is_board_valid(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     return true;
 }
 
-// returns the number of rows cleared.
-int commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
+void commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     int shape_cell;
     int board_i;
     int board_j;
@@ -63,7 +62,10 @@ int commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
             }
         }
     }
+}
 
+// returns the number of rows cleared.
+int clear_full_rows(int board[BOARD_H][BOARD_W]) {
     int cleared = 0;
     int cell_count;
     for (int i = 1; i < BOARD_H - 1; i++) {
@@ -83,6 +85,25 @@ int commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     }
 
     return cleared;
+}
+
+void drop_dangling_cells(int board[BOARD_H][BOARD_W]) {
+    int cell_type;
+    int floor_below;
+    for (int i = BOARD_H; i != 0; i--) {
+        for (int j = 0; j < BOARD_W; j++) {
+            cell_type = board[i][j];
+            floor_below = i;
+
+            if (cell_type != 0 && cell_type != 1) {
+                while (board[floor_below + 1][j] == 0)
+                    floor_below++;
+
+                board[i][j] = 0;
+                board[floor_below][j] = cell_type;
+            }
+        }
+    }
 }
 
 bool try_move_tetromino_down(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
@@ -208,7 +229,7 @@ int main(int argc, char *argv[]) {
     tetromino.active = true;
     tetromino.rotation = 0;
     tetromino.x = 6;
-    tetromino.y = 0;
+    tetromino.y = 1;
     tetromino.shape = tetrominos[rand() % 7];
 
     uint64_t now = SDL_GetTicks64();
@@ -225,6 +246,15 @@ int main(int argc, char *argv[]) {
         user_pressed_left = false;
         user_pressed_right = false;
         user_pressed_down = false;
+
+        if (!tetromino.active) {
+            tetromino.active = true;
+            tetromino.rotation = 0;
+            tetromino.x = 6;
+            tetromino.y = 1;
+            tetromino.shape = tetrominos[rand() % 7];
+            printf("current shape: %d\n", tetromino.shape.type);
+        }
 
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
@@ -265,15 +295,14 @@ int main(int argc, char *argv[]) {
             if (try_move_tetromino_down(board, tetromino)) {
                 tetromino.y += 1;
             } else {
+                commit_tetromino(board, tetromino);
+                int cleared = 0;
+                while ((cleared = clear_full_rows(board))) {
+                    score += calculate_score(cleared);
+                    printf("Score: %d\n", score);
+                    drop_dangling_cells(board);
+                }
                 tetromino.active = false;
-                score += calculate_score(commit_tetromino(board, tetromino));
-                printf("Score: %d\n", score);
-
-                tetromino.active = true;
-                tetromino.rotation = 0;
-                tetromino.x = 6;
-                tetromino.y = 0;
-                tetromino.shape = tetrominos[rand() % 7];
             }
         }
 
