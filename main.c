@@ -248,6 +248,11 @@ int main(int argc, char *argv[]) {
         user_pressed_down = false;
 
         if (!tetromino.active) {
+            // BUG: There's a bug when we reset the tetromino.
+            // Most of the time, it happens when the new shape is the I or J shape.
+            //
+            // Note: if we lock the shapes to I, and don't re-assign, the bug does not
+            // happen.
             tetromino.active = true;
             tetromino.rotation = 0;
             tetromino.x = 6;
