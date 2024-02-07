@@ -17,8 +17,39 @@
 struct tetromino {
     int x, y;
     int rotation;
+    bool active;
     struct tetromino_shape shape;
 };
+
+bool is_board_valid(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
+    int shape_cell;
+    int board_i;
+    int board_j;
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            shape_cell = tetromino.shape.cells[i + 4*tetromino.rotation][j];
+            if (shape_cell != 0) {
+                board_i = i + tetromino.y;
+                board_j = j + tetromino.x;
+
+                if (board_j < 0 || board_j >= BOARD_W || board_i < 0 || board_i >= BOARD_H)
+                    return false;
+
+                if (board[board_i][board_j] != 0) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool try_move_tetromino_down(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
+    tetromino.y += 1;
+    return is_board_valid(board, tetromino);
+}
 
 int main(int argc, char *argv[]) {
     srand(time(NULL));
@@ -101,6 +132,7 @@ int main(int argc, char *argv[]) {
     };
 
     struct tetromino tetromino;
+    tetromino.active = true;
     tetromino.rotation = 0;
     tetromino.x = 6;
     tetromino.y = 0;
@@ -152,17 +184,23 @@ int main(int argc, char *argv[]) {
         if (now >= tick_timeout) {
             tick_timeout = now + tick_time;
 
-            tetromino.y += 1;
+            if (try_move_tetromino_down(board, tetromino)) {
+                tetromino.y += 1;
+            } else {
+                tetromino.active = false;
+            }
         }
 
-        if (user_pressed_left)
-            tetromino.x -= 1;
+        if (tetromino.active) {
+            if (user_pressed_left)
+                tetromino.x -= 1;
 
-        if (user_pressed_right)
-            tetromino.x += 1;
+            if (user_pressed_right)
+                tetromino.x += 1;
 
-        if (user_pressed_rotation)
-            tetromino.rotation = (tetromino.rotation + 1) % 4;
+            if (user_pressed_rotation)
+                tetromino.rotation = (tetromino.rotation + 1) % 4;
+        }
 
         // render game state
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
