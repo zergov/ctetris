@@ -46,7 +46,8 @@ bool is_board_valid(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     return true;
 }
 
-void commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
+// returns the number of rows cleared.
+int commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     int shape_cell;
     int board_i;
     int board_j;
@@ -62,6 +63,26 @@ void commit_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
             }
         }
     }
+
+    int cleared = 0;
+    int cell_count;
+    for (int i = 1; i < BOARD_H - 1; i++) {
+        cell_count = 0;
+
+        for (int j = 1; j < BOARD_W - 1; j++) {
+            if (board[i][j] == 0) break;
+            cell_count++;
+        }
+
+        if (cell_count == BOARD_W - 2) {
+            for (int j = 1; j < BOARD_W - 1; j++) {
+                board[i][j] = 0;
+            }
+            cleared++;
+        }
+    }
+
+    return cleared;
 }
 
 bool try_move_tetromino_down(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
@@ -82,6 +103,23 @@ bool try_move_tetromino_right(int board[BOARD_H][BOARD_W], struct tetromino tetr
 bool try_rotate_tetromino(int board[BOARD_H][BOARD_W], struct tetromino tetromino) {
     tetromino.rotation = (tetromino.rotation + 1) % 4;
     return is_board_valid(board, tetromino);
+}
+
+int calculate_score(int cleared) {
+    if (cleared <= 0) return 0;
+
+    switch (cleared) {
+        case 1:
+            return 100;
+        case 2:
+            return 300;
+        case 3:
+            return 500;
+        case 4:
+            return 800;
+        default:
+            return 800;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -128,9 +166,9 @@ int main(int argc, char *argv[]) {
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 1},
-        {1, 0, 0, 6, 6, 0, 0, 4, 5, 5, 3, 1},
-        {1, 0, 6, 6, 7, 7, 7, 4, 5, 5, 3, 1},
+        {1, 7, 0, 0, 0, 0, 0, 0, 0, 8, 8, 1},
+        {1, 7, 7, 6, 6, 0, 0, 4, 5, 5, 3, 1},
+        {1, 7, 6, 6, 7, 7, 7, 4, 5, 5, 3, 1},
         {1, 2, 2, 2, 2, 7, 0, 4, 4, 3, 3, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
@@ -163,6 +201,8 @@ int main(int argc, char *argv[]) {
         TETROMINO_T_SHAPE,
         TETROMINO_Z_SHAPE,
     };
+
+    int score = 0;
 
     struct tetromino tetromino;
     tetromino.active = true;
@@ -226,7 +266,8 @@ int main(int argc, char *argv[]) {
                 tetromino.y += 1;
             } else {
                 tetromino.active = false;
-                commit_tetromino(board, tetromino);
+                score += calculate_score(commit_tetromino(board, tetromino));
+                printf("Score: %d\n", score);
 
                 tetromino.active = true;
                 tetromino.rotation = 0;
