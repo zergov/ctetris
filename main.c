@@ -178,11 +178,13 @@ int main(int argc, char *argv[]) {
     bool user_pressed_rotation;
     bool user_pressed_left;
     bool user_pressed_right;
+    bool user_pressed_down;
 
     while (1) {
         user_pressed_rotation = false;
         user_pressed_left = false;
         user_pressed_right = false;
+        user_pressed_down = false;
 
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
@@ -203,6 +205,9 @@ int main(int argc, char *argv[]) {
                             break;
                         case SDL_SCANCODE_RIGHT:
                             user_pressed_right = true;
+                            break;
+                        case SDL_SCANCODE_DOWN:
+                            user_pressed_down = true;
                             break;
                         default:
                             break;
@@ -237,6 +242,9 @@ int main(int argc, char *argv[]) {
 
             if (user_pressed_right && try_move_tetromino_right(board, tetromino))
                 tetromino.x += 1;
+
+            if (user_pressed_down && try_move_tetromino_down(board, tetromino))
+                tetromino.y += 1;
 
             if (user_pressed_rotation && try_rotate_tetromino(board, tetromino))
                 tetromino.rotation = (tetromino.rotation + 1) % 4;
