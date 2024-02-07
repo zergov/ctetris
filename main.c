@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <SDL2/SDL.h>
 
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
     struct SDL_Rect cell;
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
-    
+
     struct tetromino_shape tetrominos[7] = {
         TETROMINO_I_SHAPE,
         TETROMINO_J_SHAPE,
@@ -98,7 +99,7 @@ int main(int argc, char *argv[]) {
         TETROMINO_T_SHAPE,
         TETROMINO_Z_SHAPE,
     };
-    
+
     struct tetromino tetromino;
     tetromino.rotation = 0;
     tetromino.x = 6;
@@ -109,7 +110,15 @@ int main(int argc, char *argv[]) {
     uint64_t tick_time = 500; // milliseconds
     uint64_t tick_timeout = now + tick_time;
 
+    bool user_pressed_rotation;
+    bool user_pressed_left;
+    bool user_pressed_right;
+
     while (1) {
+        user_pressed_rotation = false;
+        user_pressed_left = false;
+        user_pressed_right = false;
+
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -122,13 +131,13 @@ int main(int argc, char *argv[]) {
 
                     switch (event.key.keysym.scancode) {
                         case SDL_SCANCODE_SPACE:
-                            tetromino.rotation = (tetromino.rotation + 1) % 4;
+                            user_pressed_rotation = true;
                             break;
                         case SDL_SCANCODE_LEFT:
-                            tetromino.x -= 1;
+                            user_pressed_left = true;
                             break;
                         case SDL_SCANCODE_RIGHT:
-                            tetromino.x += 1;
+                            user_pressed_right = true;
                             break;
                         default:
                             break;
@@ -145,6 +154,15 @@ int main(int argc, char *argv[]) {
 
             tetromino.y += 1;
         }
+
+        if (user_pressed_left)
+            tetromino.x -= 1;
+
+        if (user_pressed_right)
+            tetromino.x += 1;
+
+        if (user_pressed_rotation)
+            tetromino.rotation = (tetromino.rotation + 1) % 4;
 
         // render game state
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
