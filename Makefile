@@ -1,2 +1,2 @@
 run:
-	gcc tetris.h main.c -l SDL2 -o tetris && ./tetris
+	gcc tetris.h tetromino.c main.c -l SDL2 -o tetris && ./tetris

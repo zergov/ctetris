@@ -213,16 +213,6 @@ int main(int argc, char *argv[]) {
     cell.w = CELL_SIZE;
     cell.h = CELL_SIZE;
 
-    struct tetromino_shape tetrominos[7] = {
-        TETROMINO_I_SHAPE,
-        TETROMINO_J_SHAPE,
-        TETROMINO_L_SHAPE,
-        TETROMINO_O_SHAPE,
-        TETROMINO_S_SHAPE,
-        TETROMINO_T_SHAPE,
-        TETROMINO_Z_SHAPE,
-    };
-
     int score = 0;
 
     struct tetromino tetromino;
@@ -230,7 +220,7 @@ int main(int argc, char *argv[]) {
     tetromino.rotation = 0;
     tetromino.x = 6;
     tetromino.y = 1;
-    tetromino.shape = tetrominos[rand() % 7];
+    tetromino.shape = create_random_tetromino_shape();
 
     uint64_t now = SDL_GetTicks64();
     uint64_t tick_time = 500; // milliseconds
@@ -248,16 +238,11 @@ int main(int argc, char *argv[]) {
         user_pressed_down = false;
 
         if (!tetromino.active) {
-            // BUG: There's a bug when we reset the tetromino.
-            // Most of the time, it happens when the new shape is the I or J shape.
-            //
-            // Note: if we lock the shapes to I, and don't re-assign, the bug does not
-            // happen.
             tetromino.active = true;
             tetromino.rotation = 0;
             tetromino.x = 6;
             tetromino.y = 1;
-            tetromino.shape = tetrominos[rand() % 7];
+            tetromino.shape = create_random_tetromino_shape();
             printf("current shape: %d\n", tetromino.shape.type);
         }
 
